@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Day2 dragable</title>
+    <script src="./assets/vue.js"></script>
+    <script src="./assets/Sortable.js"></script>
+    <script src="./assets/vuedraggable.umd.js"></script>
+    <style type="text/css">
+      .app {
+        padding: 20px 24px;
+      }
+      .task {
+        padding: 6px 12px;
+      }
+      .task:hover {
+        color: #69c;
+      }
+      .task-text.finished {
+        color: #ccc;
+        text-decoration: line-through;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <fieldset>
+        <legend>To-do list</legend>
+        Add Task:
+        <input type="text" v-model="newTaskContent" />
+        <button v-on:click="addTask()">add</button>
+        <p>
+          Loading state:&nbsp
+          <span style="color:blue;">{{ isLoading }}</span>
+        </p>
+        <draggable>
+          <div class="task" v-for="(todo,index) in filter" :key="index">
+            <input type="checkbox" v-model="todo.isFinished" />
+            <span
+              class="task-text"
+              :class="{ finished: todo.isFinished }"
+              :id="`todo${index}`"
+              v-on:click="getClick(todo.content)"
+            >
+              {{ todo.content }}
+            </span>
+            <a href="#" v-on:click="sealTask(todo)">(seal)</a>
+          </div>
+        </draggable>
+      </fieldset>
+    </div>
+
+    <script type="text/javascript">
+      let app = new Vue({
+        el: "#app",
+        data: {
+          newTaskContent: "",
+          todos: [],
+          isLoading: true
+        },
+        computed: {
+          filter () {
+            return this.todos.filter((param) => {
+              return param.isSealed === false
+            })
+          }
+        },
+        mounted() {
+          this.getTodosData()
+        },
+        methods: {
+          getTodosData() {
+            this.isLoading = true
+            this.apiGetDataByDB()
+              .then(_todos => {
+                this.todos = _todos
+
+                // this.$nextTick(() => {
+                //   this.addClickEvent2Todos()
+                // })
+              })
+              .finally(() => {
+                this.isLoading = false
+              })
+          },
+          apiGetDataByDB() {
+            return new Promise((resolve, reject) => {
+              // Simulate api behavior by setTimeout
+              setTimeout(() => {
+                resolve([
+                  {
+                    content: "Todo 1 from DB",
+                    isFinished: false,
+                    isSealed: false
+                  },
+                  {
+                    content: "Todo 2 from DB",
+                    isFinished: false,
+                    isSealed: false
+                  },
+                  {
+                    content: "Todo 3 from DB",
+                    isFinished: false,
+                    isSealed: false
+                  },
+                  {
+                    content: "Todo 4 from DB",
+                    isFinished: false,
+                    isSealed: false
+                  },
+                  {
+                    content: "Todo 5 from DB",
+                    isFinished: false,
+                    isSealed: false
+                  }
+                ])
+              }, 3000)
+            })
+          },
+          getClick(index) {
+            alert(index)
+          },
+          // addClickEvent2Todos() {
+          //   this.todos.forEach((todo) => {
+          //     let el = document.getElementById(`${todo.content}`)
+          //     console.log(el)
+          //     el.addEventListener("click", () => {
+          //       window.alert(todo.content)
+          //     })
+          //   })
+          // },
+          addTask() {
+            if (this.newTaskContent === "") {
+              return
+            }
+
+            let newTask = this.createTaskObject(this.newTaskContent)
+
+            this.todos.push(newTask)
+
+            this.newTaskContent = ""
+          },
+          createTaskObject(_taskContent) {
+            return { content: _taskContent, isFinished: false, isSealed: false }
+          },
+          sealTask(_todo) {
+            _todo.isSealed = true
+          }
+        }
+      })
+    </script>
+  </body>
+</html>

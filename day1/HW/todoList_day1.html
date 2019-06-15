@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Examples</title>
+    <script src="./assets/vue.js"></script>
+    <style type="text/css">
+      .app {
+        padding: 20px 24px;
+      }
+      .task {
+        padding: 6px 12px;
+      }
+      .task:hover {
+        color: #69c;
+      }
+      .task-text.finished {
+        color: #ccc;
+        text-decoration: line-through;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <fieldset>
+        <legend>To-do list</legend>
+        Add Task:
+        <!-- Bind input value with newTaskContent by v-model  -->
+        <input type="text" v-model="newTaskContent" />
+
+        <!-- Bind click event with addTask() by v-bind  -->
+        <button v-on:click="addTask">add</button>
+        <ul>
+          <!-- List todo in todos by v-for  -->
+          <li class="task" v-for="(todo, key) in todos" :key="key">
+            <!-- Change isFinished of todo state when checkbox is checked or not by v-model  -->
+            <input type="checkbox" v-model="todo.isFinished" />
+
+            <!-- Bind className:finished with todo.isFinished is true or false by v-bind  -->
+            <span class="task-text" :class="{'finished': todo.isFinished}">
+              <!-- Write todo content by mustache  -->
+              {{todo.content}}
+            </span>
+
+            <!-- Bind click event with removeTask() by v-bind  -->
+            <a href="#" v-on:click="removeTask(todo)">(delete)</a>
+          </li>
+        </ul>
+      </fieldset>
+    </div>
+
+    <script type="text/javascript">
+      let app = new Vue({
+        el: "#app",
+        data: {
+          newTaskContent: "",
+          todos: [{ content: "My first task", isFinished: false }]
+        },
+        methods: {
+          addTask() {
+            if (this.newTaskContent === "") {
+              return
+            }
+
+            let newTask = this.createTaskObject(this.newTaskContent)
+
+            this.todos.push(newTask)
+
+            this.newTaskContent = ""
+          },
+          createTaskObject(_taskContent) {
+            return { content: _taskContent, isFinished: false }
+          },
+          removeTask(todo) {
+            this.todos.splice(this.todos.indexOf(todo), 1)
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
